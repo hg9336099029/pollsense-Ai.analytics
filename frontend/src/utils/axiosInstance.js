@@ -8,9 +8,9 @@ const axiosInstance = axios.create({
 
 // If a request supplies a full URL (starts with http) remove baseURL so axios won't prepend it
 axiosInstance.interceptors.request.use(config => {
-  if (config && config.url && /^https?:\/\//i.test(config.url)) {
-    return { ...config, baseURL: undefined };
-  }
+  // if (config && config.url && /^https?:\/\//i.test(config.url)) {
+  //   baseURL = { ...config, baseURL: undefined }
+  // }
 
   // Add Authorization header if token exists
   const token = localStorage.getItem('accessToken');
