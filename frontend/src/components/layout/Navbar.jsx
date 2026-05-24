@@ -22,7 +22,7 @@ const Navbar = () => {
       try {
         const parsedUser = JSON.parse(storedUser);
         setUserData(parsedUser);
-        console.log('User data loaded:', parsedUser);
+        // console.log('User data loaded:', parsedUser);
       } catch (error) {
         console.error('Error parsing user data:', error);
       }
@@ -79,7 +79,7 @@ const Navbar = () => {
   const profileImageUrl = userData?.profileImageUrl;
   const userInitial = displayName?.charAt(0).toUpperCase() || 'U';
 
-  console.log('Profile Image URL:', profileImageUrl);
+  // console.log('Profile Image URL:', profileImageUrl);
 
   return (
     <nav className="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50">
