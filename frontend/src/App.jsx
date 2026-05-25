@@ -53,6 +53,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
           <Route
             path="/my-polls"
             element={
@@ -61,6 +62,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/voted-polls"
             element={
@@ -69,6 +71,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/bookmarks"
             element={
