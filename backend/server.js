@@ -223,6 +223,12 @@ const server = app.listen(port, () => {
   console.log(`✅ CORS allowed origins:`, allowedOrigins);
   console.log(`🗄️  Database: ${process.env.MONGO_URL ? 'Configured' : 'NOT SET'}`);
   console.log(`${process.env.JWT_SECRET ? '🔐 JWT Secret: Configured' : '⚠️  JWT Secret: NOT SET'}`);
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey && groqKey !== 'gsk_YOUR_GROQ_KEY_HERE') {
+    console.log(`🤖 GROQ_API_KEY: Configured ✅`);
+  } else {
+    console.log(`⚠️  GROQ_API_KEY: NOT SET — sentiment will use keyword fallback`);
+  }
   console.log(`${'='.repeat(50)}\n`);
 });
 

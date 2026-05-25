@@ -5,6 +5,7 @@ import { axiosInstance } from '../../utils/axiosInstance';
 import { API_PATH } from '../../utils/apipath';
 import { FaRegBookmark, FaBookmark } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { SentimentBadge, TopicBadge, SentimentMiniBar } from '../../components/layout/SentimentBadge';
 
 const Home = () => {
   const [polls, setPolls] = useState([]);
@@ -153,7 +154,7 @@ const Home = () => {
                     </div>
 
                     {/* Stats */}
-                    <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex gap-4 flex-wrap">
+                    <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex gap-4 flex-wrap items-start">
                       <div>
                         <p className="text-2xl font-bold text-blue-600">{totalVotes}</p>
                         <p className="text-xs text-gray-600">Total Votes</p>
@@ -166,7 +167,20 @@ const Home = () => {
                         <p className="text-2xl font-bold text-green-600">{poll.options.length}</p>
                         <p className="text-xs text-gray-600">Options</p>
                       </div>
+                      {/* AI Sentiment badge — free from MongoDB cache */}
+                      {poll.sentiment?.label && (
+                        <div className="ml-auto flex items-center gap-2 flex-wrap">
+                          <SentimentBadge label={poll.sentiment.label} score={poll.sentiment.score} />
+                          {poll.sentiment.topic && <TopicBadge topic={poll.sentiment.topic} />}
+                        </div>
+                      )}
                     </div>
+                    {/* AI Summary */}
+                    {poll.sentiment?.summary && (
+                      <div className="px-6 pt-3 pb-0">
+                        <p className="text-xs italic text-gray-400">💬 {poll.sentiment.summary}</p>
+                      </div>
+                    )}
 
                     {/* Options */}
                     <div className="p-6 space-y-3">
