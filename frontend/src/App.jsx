@@ -34,9 +34,23 @@ function App() {
           <Route path="/signup" element={<SignUpForm />} />
           <Route path="/login" element={<Login />} />
 
-          {/* Public Dashboard Routes */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/sentiment-dashboard" element={<SentimentDashboard />} />
+          {/* Protected Dashboard Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sentiment-dashboard"
+            element={
+              <ProtectedRoute>
+                <SentimentDashboard />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected Routes */}
           <Route
@@ -99,8 +113,8 @@ function App() {
             }
           />
 
-          {/* Redirect root to dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Redirect root to home (which is protected) */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
 
           {/* 404 - Not Found Route */}
           <Route path="*" element={<Navigate to="/login" replace />} />
