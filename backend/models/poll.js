@@ -36,7 +36,19 @@ const pollSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
         }
-    ]
+    ],
+    sentiment: {
+        label: {
+            type: String,
+            enum: ['Positive', 'Negative', 'Neutral', 'Controversial', 'Engaging'],
+        },
+        score: { type: Number, min: 0, max: 100 },
+        emotion: { type: String },
+        topic: { type: String },
+        summary: { type: String },
+        keywords: [{ type: String }],
+        analyzedAt: { type: Date },
+    },
 }, { timestamps: true });
 
 const Poll = mongoose.model('Poll', pollSchema);

@@ -5,11 +5,13 @@ import { axiosInstance } from '../../utils/axiosInstance';
 import { API_PATH } from '../../utils/apipath';
 import { FaBookmark } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { SentimentBadge, TopicBadge, SENTIMENT_CONFIG } from '../../components/layout/SentimentBadge';
 
 const Bookmark = () => {
   const [bookmarkedPolls, setBookmarkedPolls] = useState([]);
   const [filteredPolls, setFilteredPolls] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sentimentFilter, setSentimentFilter] = useState('All');
 
   useEffect(() => {
     const fetchBookmarkedPolls = async () => {
@@ -48,10 +50,23 @@ const Bookmark = () => {
 
   const handleFilterSelect = (filter) => {
     if (filter === 'All-polls') {
-      setFilteredPolls(bookmarkedPolls);
+      applyMoodFilter(bookmarkedPolls, sentimentFilter);
     } else {
-      setFilteredPolls(bookmarkedPolls.filter((poll) => poll.pollType === filter));
+      applyMoodFilter(bookmarkedPolls.filter((poll) => poll.pollType === filter), sentimentFilter);
     }
+  };
+
+  const applyMoodFilter = (polls, mood) => {
+    if (mood === 'All') {
+      setFilteredPolls(polls);
+    } else {
+      setFilteredPolls(polls.filter(p => p.sentiment?.label === mood));
+    }
+  };
+
+  const handleMoodFilter = (mood) => {
+    setSentimentFilter(mood);
+    applyMoodFilter(bookmarkedPolls, mood);
   };
 
   const getTotalVotes = (poll) => {
@@ -86,8 +101,28 @@ const Bookmark = () => {
           </div>
 
           {/* Filter */}
-          <div className="mb-8">
+          <div className="mb-4">
             <FilterDropdown onFilterSelect={handleFilterSelect} />
+          </div>
+
+          {/* Mood Filter Buttons */}
+          <div className="flex gap-2 flex-wrap mb-6">
+            {['All', 'Positive', 'Negative', 'Neutral', 'Controversial', 'Engaging'].map(mood => {
+              const cfg = SENTIMENT_CONFIG[mood];
+              return (
+                <button
+                  key={mood}
+                  onClick={() => handleMoodFilter(mood)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${
+                    sentimentFilter === mood
+                      ? 'bg-blue-600 text-white border-blue-600 shadow'
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
+                  }`}
+                >
+                  {mood === 'All' ? '🔍 All' : `${cfg?.emoji} ${mood}`}
+                </button>
+              );
+            })}
           </div>
 
           {/* Polls Grid */}
@@ -121,7 +156,7 @@ const Bookmark = () => {
                     </div>
 
                     {/* Stats */}
-                    <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex gap-4">
+                    <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex gap-4 flex-wrap items-start">
                       <div>
                         <p className="text-2xl font-bold text-blue-600">{totalVotes}</p>
                         <p className="text-xs text-gray-600">Total Votes</p>
@@ -130,7 +165,18 @@ const Bookmark = () => {
                         <p className="text-2xl font-bold text-purple-600 capitalize">{poll.pollType}</p>
                         <p className="text-xs text-gray-600">Poll Type</p>
                       </div>
+                      {poll.sentiment?.label && (
+                        <div className="ml-auto flex items-center gap-2 flex-wrap">
+                          <SentimentBadge label={poll.sentiment.label} score={poll.sentiment.score} />
+                          {poll.sentiment.topic && <TopicBadge topic={poll.sentiment.topic} />}
+                        </div>
+                      )}
                     </div>
+                    {poll.sentiment?.summary && (
+                      <div className="px-6 pt-3">
+                        <p className="text-xs italic text-gray-400">💬 {poll.sentiment.summary}</p>
+                      </div>
+                    )}
 
                     {/* Options */}
                     <div className="p-6 space-y-3">

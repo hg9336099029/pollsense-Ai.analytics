@@ -4,6 +4,7 @@ import FilterDropdown from '../../components/layout/filter';
 import { axiosInstance } from '../../utils/axiosInstance';
 import { API_PATH } from '../../utils/apipath';
 import { toast } from 'react-toastify';
+import { SentimentBadge, TopicBadge, SentimentMiniBar } from '../../components/layout/SentimentBadge';
 
 const MyPolls = () => {
   const [polls, setPolls] = useState([]);
@@ -114,7 +115,7 @@ const MyPolls = () => {
                     <div className="p-6 border-b border-gray-200 flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{poll.question}</h3>
-                        <div className="flex gap-3 flex-wrap">
+                        <div className="flex gap-2 flex-wrap">
                           <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
                             {poll.pollType.charAt(0).toUpperCase() + poll.pollType.slice(1)}
                           </span>
@@ -124,6 +125,8 @@ const MyPolls = () => {
                           <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full">
                             {poll.options.length} options
                           </span>
+                          {poll.sentiment?.label && <SentimentBadge label={poll.sentiment.label} score={poll.sentiment.score} showScore={false} />}
+                          {poll.sentiment?.topic && <TopicBadge topic={poll.sentiment.topic} />}
                         </div>
                       </div>
                       <button
@@ -139,6 +142,9 @@ const MyPolls = () => {
                     {/* Poll Stats */}
                     <div className="p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200">
                       <p className="text-sm text-gray-600 mb-4">Created {new Date(poll.createdAt).toLocaleDateString()}</p>
+                      {poll.sentiment?.summary && (
+                        <p className="text-xs italic text-gray-400 mb-3">🤖 AI says: "{poll.sentiment.summary}"</p>
+                      )}
                       <div className="grid grid-cols-3 gap-4">
                         <div>
                           <p className="text-2xl font-bold text-blue-600">{totalVotes}</p>
@@ -167,11 +173,17 @@ const MyPolls = () => {
                             <div
                               className="bg-gradient-to-r from-blue-500 to-purple-600 h-full transition-all duration-300"
                               style={{ width: `${getVotePercentage(option.votes, totalVotes)}%` }}
-                            ></div>
+                            />
                           </div>
                         </div>
                       ))}
                     </div>
+                    {/* Sentiment mini-bar */}
+                    {poll.sentiment?.score !== undefined && (
+                      <div className="px-6 pb-4 pt-2 border-t border-gray-100">
+                        <SentimentMiniBar score={poll.sentiment.score} showLabel={true} />
+                      </div>
+                    )}
                   </div>
                 );
               })}

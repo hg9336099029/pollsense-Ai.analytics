@@ -17,6 +17,7 @@ export const API_PATH = {
     BOOKMARK_POLL: `${BASE_URL}/api/v1/auth/bookmarkpoll`,
     GET_BOOOKMARK_POLLS: `${BASE_URL}/api/v1/auth/getbookmarkedpolls`,
     TRENDING_POLLS: `${BASE_URL}/api/v1/auth/trendingpolls`,
+    ANALYZE_SENTIMENT: `${BASE_URL}/api/v1/auth/analyze-sentiment`,
   },
   IMAGE: {
     UPLOAD: `${BASE_URL}/api/v1/image/upload-image`,
