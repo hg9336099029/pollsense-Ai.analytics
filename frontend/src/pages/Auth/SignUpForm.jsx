@@ -6,6 +6,7 @@ import { axiosInstance } from "../../utils/axiosInstance";
 import { API_PATH } from "../../utils/apipath";
 import { UserContext } from "../../context/userContext";
 import { ToastContainer } from 'react-toastify';
+import { getErrorMessage } from "../../utils/errorHandler";
 import 'react-toastify/dist/ReactToastify.css';
 
 const SignUpForm = () => {
@@ -112,8 +113,9 @@ const SignUpForm = () => {
         message: error.message,
         status: error.response?.status,
         data: error.response?.data,
-        url: error.config?.url,
       });
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

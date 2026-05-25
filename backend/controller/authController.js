@@ -23,8 +23,7 @@ const register = [
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
     }
 
     const { username, fullname, email, password } = req.body;
@@ -32,19 +31,21 @@ const register = [
     try {
       // Validate password separately (don't apply escape to password)
       if (!password || password.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+        return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
       }
 
       // Check if user already exists
       const existingUser = await User.findOne({ $or: [{ email }, { username }] });
       if (existingUser) {
-        return res.status(409).json({ message: 'User already exists' });
+        return res.status(409).json({ success: false, message: 'User already exists' });
       }
 
       const user = await User.create({ username, fullname, email, password });
       const token = generateToken(user._id);
 
       res.status(201).json({
+        success: true,
+        message: 'Registration successful',
         token,
         user: {
           _id: user._id,
@@ -55,7 +56,7 @@ const register = [
       });
     } catch (error) {
       console.error('Registration error:', error);
-      res.status(500).json({ message: 'Registration failed' });
+      res.status(500).json({ success: false, message: 'Registration failed', error: error.message });
     }
   }
 ];
@@ -67,7 +68,7 @@ const login = [
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ success: false, message: 'Validation failed', errors: errors.array() });
     }
 
     const { email, password } = req.body;
@@ -75,21 +76,23 @@ const login = [
     try {
       // Validate password exists
       if (!password || password.trim() === '') {
-        return res.status(400).json({ message: 'Password is required' });
+        return res.status(400).json({ success: false, message: 'Password is required' });
       }
 
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json({ success: false, message: 'No account found with this email' });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        return res.status(401).json({ success: false, message: 'Incorrect password' });
       }
 
       const token = generateToken(user._id);
       res.status(200).json({
+        success: true,
+        message: 'Login successful',
         token,
         user: {
           _id: user._id,
@@ -101,7 +104,7 @@ const login = [
       });
     } catch (error) {
       console.error('Login error:', error);
-      res.status(500).json({ message: 'Login failed' });
+      res.status(500).json({ success: false, message: 'Login failed', error: error.message });
     }
   }
 ];
@@ -109,9 +112,9 @@ const login = [
 // Logout user
 const logout = async (req, res) => {
   try {
-    res.status(200).json({ message: 'Logout successful' });
+    res.status(200).json({ success: true, message: 'Logout successful' });
   } catch (error) {
-    res.status(500).json({ message: 'Logout failed' });
+    res.status(500).json({ success: false, message: 'Logout failed', error: error.message });
   }
 };
 
@@ -120,12 +123,12 @@ const getuserdetails = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
-    res.status(200).json({ user });
+    res.status(200).json({ success: true, user });
   } catch (error) {
     console.error('Get user details error:', error);
-    res.status(500).json({ message: 'Failed to fetch user details' });
+    res.status(500).json({ success: false, message: 'Failed to fetch user details', error: error.message });
   }
 };
 
@@ -137,7 +140,7 @@ const updateProfile = async (req, res) => {
 
     // Validate required fields
     if (!fullname || !username) {
-      return res.status(400).json({ message: 'Fullname and username are required' });
+      return res.status(400).json({ success: false, message: 'Fullname and username are required' });
     }
 
     // Check if username already exists (excluding current user)
@@ -147,7 +150,7 @@ const updateProfile = async (req, res) => {
     });
 
     if (existingUser) {
-      return res.status(409).json({ message: 'Username already taken' });
+      return res.status(409).json({ success: false, message: 'Username already taken' });
     }
 
     // Prepare update data
@@ -172,12 +175,13 @@ const updateProfile = async (req, res) => {
     ).select('-password');
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
     console.log('Updated user:', user);
 
     res.status(200).json({
+      success: true,
       message: 'Profile updated successfully',
       user: {
         _id: user._id,
@@ -189,7 +193,7 @@ const updateProfile = async (req, res) => {
     });
   } catch (error) {
     console.error('Update profile error:', error);
-    res.status(500).json({ message: 'Failed to update profile', error: error.message });
+    res.status(500).json({ success: false, message: 'Failed to update profile', error: error.message });
   }
 };
 
@@ -201,7 +205,7 @@ const changePassword = async (req, res) => {
 
     // Validate inputs
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: 'Current password and new password are required' });
+      return res.status(400).json({ success: false, message: 'Current password and new password are required' });
     }
 
     // Trim passwords
@@ -210,41 +214,41 @@ const changePassword = async (req, res) => {
 
     // Validate new password
     if (trimmedNewPassword.length < 8) {
-      return res.status(400).json({ message: 'New password must be at least 8 characters' });
+      return res.status(400).json({ success: false, message: 'New password must be at least 8 characters' });
     }
 
     if (!/[a-z]/.test(trimmedNewPassword)) {
-      return res.status(400).json({ message: 'Password must contain at least one lowercase letter' });
+      return res.status(400).json({ success: false, message: 'Password must contain at least one lowercase letter' });
     }
 
     if (!/[A-Z]/.test(trimmedNewPassword)) {
-      return res.status(400).json({ message: 'Password must contain at least one uppercase letter' });
+      return res.status(400).json({ success: false, message: 'Password must contain at least one uppercase letter' });
     }
 
     if (!/\d/.test(trimmedNewPassword)) {
-      return res.status(400).json({ message: 'Password must contain at least one number' });
+      return res.status(400).json({ success: false, message: 'Password must contain at least one number' });
     }
 
     if (trimmedCurrentPassword.length === 0) {
-      return res.status(400).json({ message: 'Current password cannot be empty' });
+      return res.status(400).json({ success: false, message: 'Current password cannot be empty' });
     }
 
     // Get user with password
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
     // Verify current password
     const isPasswordMatch = await bcrypt.compare(trimmedCurrentPassword, user.password);
     if (!isPasswordMatch) {
-      return res.status(401).json({ message: 'Current password is incorrect' });
+      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
     }
 
     // Check if new password is same as current
     const isSamePassword = await bcrypt.compare(trimmedNewPassword, user.password);
     if (isSamePassword) {
-      return res.status(400).json({ message: 'New password must be different from current password' });
+      return res.status(400).json({ success: false, message: 'New password must be different from current password' });
     }
 
     // Update password
@@ -252,11 +256,12 @@ const changePassword = async (req, res) => {
     await user.save();
 
     res.status(200).json({
+      success: true,
       message: 'Password changed successfully'
     });
   } catch (error) {
     console.error('Change password error:', error);
-    res.status(500).json({ message: 'Failed to change password', error: error.message });
+    res.status(500).json({ success: false, message: 'Failed to change password', error: error.message });
   }
 };
 

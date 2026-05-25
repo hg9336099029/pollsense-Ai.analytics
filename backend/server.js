@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+
 const mongoSanitize = require('express-mongo-sanitize');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
@@ -47,7 +47,7 @@ const corsOptions = {
       console.log('✅ CORS allowed');
       callback(null, true);
     } else {
-      console.log('❌ CORS blocked for:', origin);
+      console.log('CORS blocked for:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -63,28 +63,6 @@ app.use(cors(corsOptions));
 // Handle preflight OPTIONS requests
 app.options('*', cors(corsOptions));
 
-// General rate limiting for all requests
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => req.path === '/health' // Skip health checks
-});
-
-// Strict rate limiting for auth endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  skipSuccessfulRequests: false,
-  message: 'Too many login attempts, please try again later.',
-  skip: (req) => {
-    return req.path !== '/login' && req.path !== '/register';
-  }
-});
-
-app.use(limiter);
 
 // Data sanitization against NoSQL injection
 app.use(mongoSanitize());
@@ -116,7 +94,7 @@ connectDB();
 const port = process.env.PORT || 8000;
 
 // API Routes with auth limiter applied
-app.use('/api/v1/auth', authLimiter, authRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

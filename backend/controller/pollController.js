@@ -93,8 +93,19 @@ const voteOnPoll = async (req, res) => {
         }
 
         // Validate the options array and the optionIndex
-        if (!poll.options || !Array.isArray(poll.options) || !poll.options[optionIndex]) {
-            return res.status(400).json({ message: "Invalid option selected" });
+        // For image-based polls, options may be empty — validate against images array instead
+        if (poll.pollType === 'imagebased') {
+            if (!poll.images || !poll.images[optionIndex]) {
+                return res.status(400).json({ message: "Invalid image option selected" });
+            }
+            // Ensure options array has enough entries to track votes per image
+            while (poll.options.length <= optionIndex) {
+                poll.options.push({ text: `Image ${poll.options.length + 1}`, votes: 0 });
+            }
+        } else {
+            if (!poll.options || !Array.isArray(poll.options) || !poll.options[optionIndex]) {
+                return res.status(400).json({ message: "Invalid option selected" });
+            }
         }
 
         // Increment the vote count for the selected option
@@ -194,5 +205,46 @@ const getTrendingPolls = async (req, res) => {
     }
 };
 
+// Submit open-ended response
+const submitOpenEndedResponse = async (req, res) => {
+    try {
+        const { pollId } = req.params;
+        const { response } = req.body;
 
-module.exports = { createPoll, getAllPolls, getUserPolls, deletePoll, voteOnPoll, getVotedPolls, bookmarkpoll, getbookmarkedPolls, getTrendingPolls };
+        if (!response || !response.trim()) {
+            return res.status(400).json({ message: 'Response text is required' });
+        }
+
+        const poll = await Poll.findById(pollId);
+        if (!poll) {
+            return res.status(404).json({ message: 'Poll not found' });
+        }
+
+        if (poll.pollType !== 'open ended') {
+            return res.status(400).json({ message: 'This endpoint is only for open-ended polls' });
+        }
+
+        if (poll.voters.includes(req.user._id)) {
+            return res.status(400).json({ message: 'You have already submitted a response to this poll' });
+        }
+
+        // Save the text response in comments
+        poll.comments.push({ user: req.user._id, text: response.trim() });
+        poll.voters.push(req.user._id);
+        await poll.save();
+
+        // Track in user's votedPolls
+        const user = await User.findById(req.user._id);
+        user.votedPolls.push(poll._id);
+        await user.save();
+
+        // Return the updated poll populated
+        const updatedPoll = await Poll.findById(pollId).populate('createdBy', 'username fullname');
+        res.status(200).json({ message: 'Response submitted successfully', poll: updatedPoll });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+module.exports = { createPoll, getAllPolls, getUserPolls, deletePoll, voteOnPoll, getVotedPolls, bookmarkpoll, getbookmarkedPolls, getTrendingPolls, submitOpenEndedResponse };

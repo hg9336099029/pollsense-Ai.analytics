@@ -142,7 +142,7 @@ const Settings = () => {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <span className="mr-2">👤</span> Account Settings
+                    <svg className="inline w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg> Account Settings
                   </button>
                   <button
                     onClick={() => setActiveTab('password')}

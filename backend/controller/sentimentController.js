@@ -143,7 +143,7 @@ const analyzeSentiment = async (req, res) => {
                             { role: 'system', content: 'You are a sentiment analysis engine. Always return valid JSON arrays only.' },
                             { role: 'user', content: buildPrompt(batch) },
                         ],
-                        model: 'llama3-8b-8192',
+                        model: 'llama-3.1-8b-instant',
                         temperature: 0.2,
                         max_tokens: 2000,
                     });

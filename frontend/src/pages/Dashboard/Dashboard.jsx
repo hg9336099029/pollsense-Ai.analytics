@@ -88,26 +88,30 @@ const Dashboard = () => {
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">📊 Poll Dashboard</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Poll Dashboard</h1>
             <p className="text-gray-500 mt-1">Overview of your polling activity and community engagement</p>
           </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
             {[
-              { label: 'Total Polls', value: stats.totalPolls, color: 'border-blue-500', bg: 'bg-blue-50', icon: '📊', text: 'text-blue-600' },
-              { label: 'Total Votes', value: stats.totalVotes, color: 'border-emerald-500', bg: 'bg-emerald-50', icon: '✅', text: 'text-emerald-600' },
-              { label: 'My Polls', value: stats.userPolls, color: 'border-violet-500', bg: 'bg-violet-50', icon: '🗳️', text: 'text-violet-600' },
-              { label: 'Voted', value: stats.votedPolls, color: 'border-amber-500', bg: 'bg-amber-50', icon: '☑️', text: 'text-amber-600' },
-              { label: 'Bookmarked', value: stats.bookmarkedPolls, color: 'border-rose-500', bg: 'bg-rose-50', icon: '🔖', text: 'text-rose-600' },
-            ].map(({ label, value, color, bg, icon, text }) => (
+              { label: 'Total Polls',  value: stats.totalPolls,       color: 'border-blue-500',   bg: 'bg-blue-50',   svgPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', text: 'text-blue-600' },
+              { label: 'Total Votes',  value: stats.totalVotes,       color: 'border-emerald-500', bg: 'bg-emerald-50', svgPath: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',                                                                                                                                                                                                                                   text: 'text-emerald-600' },
+              { label: 'My Polls',     value: stats.userPolls,        color: 'border-violet-500',  bg: 'bg-violet-50',  svgPath: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',                                                                                                                                                    text: 'text-violet-600' },
+              { label: 'Voted',        value: stats.votedPolls,       color: 'border-amber-500',   bg: 'bg-amber-50',   svgPath: 'M5 13l4 4L19 7',                                                                                                                                                                                                                                                                         text: 'text-amber-600' },
+              { label: 'Bookmarked',   value: stats.bookmarkedPolls,  color: 'border-rose-500',    bg: 'bg-rose-50',    svgPath: 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z',                                                                                                                                                                                                                                      text: 'text-rose-600' },
+            ].map(({ label, value, color, bg, svgPath, text }) => (
               <div key={label} className={`bg-white rounded-2xl shadow-sm p-5 border-l-4 ${color} hover:shadow-md transition-all`}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-xs font-medium uppercase tracking-wide">{label}</p>
                     <p className={`text-3xl font-black mt-1 ${text}`}>{value}</p>
                   </div>
-                  <span className={`text-2xl ${bg} rounded-xl p-2`}>{icon}</span>
+                  <div className={`${bg} rounded-xl p-2.5`}>
+                    <svg className={`w-5 h-5 ${text}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d={svgPath} />
+                    </svg>
+                  </div>
                 </div>
               </div>
             ))}
@@ -137,15 +141,19 @@ const Dashboard = () => {
 
             {/* Quick Insights */}
             <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-sm p-6 text-white">
-              <h2 className="text-lg font-bold mb-6">⚡ Quick Insights</h2>
+              <h2 className="text-lg font-bold mb-6">Quick Insights</h2>
               <div className="grid grid-cols-1 gap-5">
                 {[
-                  { label: 'Engagement Rate', value: `${engagementRate}%`, sub: 'votes vs expected capacity', icon: '📈' },
-                  { label: 'Avg Votes / Poll', value: avgVotes, sub: 'community participation', icon: '🗳️' },
-                  { label: 'Participation Rate', value: `${participationRate}%`, sub: 'polls where you voted', icon: '☑️' },
-                ].map(({ label, value, sub, icon }) => (
+                  { label: 'Engagement Rate',    value: `${engagementRate}%`, sub: 'votes vs expected capacity',  svgPath: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
+                  { label: 'Avg Votes / Poll',   value: avgVotes,              sub: 'community participation',     svgPath: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+                  { label: 'Participation Rate', value: `${participationRate}%`, sub: 'polls where you voted',    svgPath: 'M5 13l4 4L19 7' },
+                ].map(({ label, value, sub, svgPath }) => (
                   <div key={label} className="flex items-center gap-4 bg-white/10 rounded-xl p-4">
-                    <span className="text-3xl">{icon}</span>
+                    <div className="bg-white/20 rounded-lg p-2 flex-shrink-0">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d={svgPath} />
+                      </svg>
+                    </div>
                     <div>
                       <p className="text-blue-100 text-xs mb-0.5">{label}</p>
                       <p className="text-2xl font-black">{value}</p>
@@ -161,7 +169,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Polls */}
             <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">🕐 Recent Polls</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-4">Recent Polls</h2>
               <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
                 {recentPolls.length > 0 ? recentPolls.map(poll => {
                   const votes = poll.options.reduce((s, o) => s + o.votes, 0);
@@ -186,7 +194,7 @@ const Dashboard = () => {
 
             {/* Trending */}
             <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h2 className="text-lg font-bold text-gray-800 mb-4">🔥 Trending Polls</h2>
+              <h2 className="text-lg font-bold text-gray-800 mb-4">Trending Polls</h2>
               <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
                 {trendingPolls.length > 0 ? trendingPolls.map((poll, idx) => {
                   const votes = poll.options.reduce((s, o) => s + o.votes, 0);

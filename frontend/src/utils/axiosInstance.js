@@ -24,6 +24,18 @@ axiosInstance.interceptors.request.use(config => {
 axiosInstance.interceptors.response.use(
   resp => resp,
   err => {
+    // Check for 401 Unauthorized globally
+    if (err.response && err.response.status === 401) {
+      // Don't intercept if it's the login endpoint failing (invalid credentials)
+      const isLoginRoute = err.config.url.includes('/login');
+      if (!isLoginRoute) {
+        console.warn('Session expired. Redirecting to login.');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
+
     // Log a compact error for debugging in browser console
     if (err && err.config) {
       console.error('axios response error:', {

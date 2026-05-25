@@ -16,11 +16,11 @@ const CreatePoll = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
 
   const pollTypes = [
-    { id: "yesno", label: "Yes/No", icon: "👍", desc: "Simple binary choice" },
-    { id: "single choice", label: "Single Choice", icon: "✓", desc: "One answer only" },
-    { id: "rating", label: "Rating", icon: "⭐", desc: "1-5 scale" },
-    { id: "imagebased", label: "Image-Based", icon: "🖼", desc: "Visual options" },
-    { id: "open ended", label: "Open-Ended", icon: "💬", desc: "Free text response" },
+    { id: "yesno",       label: "Yes / No",     desc: "Simple binary choice" },
+    { id: "single choice", label: "Single Choice", desc: "One answer only" },
+    { id: "rating",      label: "Rating",        desc: "1–5 scale" },
+    { id: "imagebased",  label: "Image-Based",   desc: "Visual options" },
+    { id: "open ended",  label: "Open-Ended",    desc: "Free text response" },
   ];
 
   const validateForm = () => {
@@ -159,9 +159,8 @@ const CreatePoll = () => {
                         : "border-gray-200 hover:border-blue-300 bg-white hover:shadow-md"
                     }`}
                   >
-                    <div className="text-3xl mb-2">{type.icon}</div>
-                    <p className="font-bold text-sm text-gray-900">{type.label}</p>
-                    <p className="text-xs text-gray-600 mt-1">{type.desc}</p>
+                    <p className={`font-bold text-sm ${selectedButton === type.id ? 'text-blue-700' : 'text-gray-900'}`}>{type.label}</p>
+                    <p className="text-xs text-gray-500 mt-1">{type.desc}</p>
                   </button>
                 ))}
               </div>

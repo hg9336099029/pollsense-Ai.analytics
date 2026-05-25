@@ -12,6 +12,8 @@ const Home = () => {
   const [filteredPolls, setFilteredPolls] = useState([]);
   const [bookmarkedPollIds, setBookmarkedPollIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [openEndedResponses, setOpenEndedResponses] = useState({});  // { pollId: text }
+  const [openEndedSubmitting, setOpenEndedSubmitting] = useState({}); // { pollId: bool }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,17 +25,21 @@ const Home = () => {
         const fetchedPolls = pollsResponse.data.polls || [];
         setPolls(fetchedPolls);
         setFilteredPolls(fetchedPolls);
-
-        // Fetch bookmarked polls to show which ones are bookmarked
-        const bookmarkedResponse = await axiosInstance.get(API_PATH.AUTH.GET_BOOOKMARK_POLLS);
-        const bookmarkedPolls = bookmarkedResponse.data.bookmarkedPolls || [];
-        const bookmarkedIds = new Set(bookmarkedPolls.map(p => p._id));
-        setBookmarkedPollIds(bookmarkedIds);
       } catch (error) {
         console.error('Error fetching polls:', error);
         toast.error('Failed to load polls');
       } finally {
         setLoading(false);
+      }
+
+      // Fetch bookmarked polls separately — failure here should not block poll display
+      try {
+        const bookmarkedResponse = await axiosInstance.get(API_PATH.AUTH.GET_BOOOKMARK_POLLS);
+        const bookmarkedPolls = bookmarkedResponse.data.bookmarkedPolls || [];
+        const bookmarkedIds = new Set(bookmarkedPolls.map(p => p._id));
+        setBookmarkedPollIds(bookmarkedIds);
+      } catch (error) {
+        console.warn('Could not load bookmarks:', error?.response?.status);
       }
     };
     fetchData();
@@ -66,6 +72,30 @@ const Home = () => {
     }
   };
 
+  const handleOpenEndedSubmit = async (pollId) => {
+    const text = (openEndedResponses[pollId] || '').trim();
+    if (!text) {
+      toast.error('Please write a response before submitting');
+      return;
+    }
+    setOpenEndedSubmitting(prev => ({ ...prev, [pollId]: true }));
+    try {
+      const res = await axiosInstance.post(`${API_PATH.AUTH.SUBMIT_OPEN_ENDED}/${pollId}`, { response: text });
+      const updatedPoll = res.data.poll;
+      // Ensure options is always an array to avoid crashes in getTotalVotes
+      if (!updatedPoll.options) updatedPoll.options = [];
+      setPolls(prev => prev.map(p => p._id === updatedPoll._id ? updatedPoll : p));
+      setFilteredPolls(prev => prev.map(p => p._id === updatedPoll._id ? updatedPoll : p));
+      setOpenEndedResponses(prev => ({ ...prev, [pollId]: '' }));
+      toast.success('Response submitted!');
+    } catch (error) {
+      console.error('Open-ended submit error:', error?.response?.data || error?.message);
+      toast.error(error?.response?.data?.message || 'Failed to submit response');
+    } finally {
+      setOpenEndedSubmitting(prev => ({ ...prev, [pollId]: false }));
+    }
+  };
+
   const handleFilterSelect = (filter) => {
     if (filter === 'All-polls') {
       setFilteredPolls(polls);
@@ -75,7 +105,8 @@ const Home = () => {
   };
 
   const getTotalVotes = (poll) => {
-    return poll.options.reduce((sum, opt) => sum + opt.votes, 0);
+    if (!poll.options || !Array.isArray(poll.options) || poll.options.length === 0) return 0;
+    return poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
   };
 
   const getVotePercentage = (votes, total) => {
@@ -178,7 +209,7 @@ const Home = () => {
                     {/* AI Summary */}
                     {poll.sentiment?.summary && (
                       <div className="px-6 pt-3 pb-0">
-                        <p className="text-xs italic text-gray-400">💬 {poll.sentiment.summary}</p>
+                        <p className="text-xs italic text-gray-400">AI insight: {poll.sentiment.summary}</p>
                       </div>
                     )}
 
@@ -242,30 +273,56 @@ const Home = () => {
 
                       {poll.pollType === 'imagebased' && poll.images && (
                         <div className="grid grid-cols-2 gap-3">
-                          {poll.images.map((img, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => handleVote(poll._id, idx)}
-                              className="relative h-40 rounded-lg overflow-hidden group border-2 border-gray-200 hover:border-blue-400 transition-all"
-                            >
-                              <img src={img} alt={`Option ${idx + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                              <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">Vote</span>
-                              </div>
-                            </button>
-                          ))}
+                          {poll.images.map((img, idx) => {
+                            const imgOption = poll.options?.[idx];
+                            const imgVotes = imgOption?.votes || 0;
+                            const imgPct = getVotePercentage(imgVotes, totalVotes);
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => handleVote(poll._id, idx)}
+                                className="relative rounded-lg overflow-hidden group border-2 border-gray-200 hover:border-blue-400 transition-all"
+                              >
+                                <img src={img} alt={`Option ${idx + 1}`} className="w-full h-40 object-cover group-hover:scale-110 transition-transform" />
+                                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 transition-opacity" />
+                                {/* Vote overlay */}
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-3 py-2">
+                                  <div className="flex items-center justify-between text-white text-xs mb-1">
+                                    <span className="font-semibold">Option {idx + 1}</span>
+                                    <span className="font-bold">{imgVotes} votes · {imgPct}%</span>
+                                  </div>
+                                  <div className="bg-white/30 h-1.5 rounded-full overflow-hidden">
+                                    <div className="bg-blue-400 h-full rounded-full transition-all" style={{ width: `${imgPct}%` }} />
+                                  </div>
+                                </div>
+                              </button>
+                            );
+                          })}
                         </div>
                       )}
 
                       {poll.pollType === 'open ended' && (
                         <div className="p-4 bg-gray-50 rounded-lg">
+                          {/* Show existing responses count */}
+                          {poll.comments?.length > 0 && (
+                            <p className="text-xs text-gray-500 mb-2 font-medium">
+                              {poll.comments.length} response{poll.comments.length !== 1 ? 's' : ''} submitted
+                            </p>
+                          )}
                           <textarea
                             placeholder="Share your thoughts..."
-                            className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-400 focus:outline-none resize-none"
+                            className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-blue-400 focus:outline-none resize-none transition-colors"
                             rows="3"
+                            value={openEndedResponses[poll._id] || ''}
+                            onChange={e => setOpenEndedResponses(prev => ({ ...prev, [poll._id]: e.target.value }))}
                           />
-                          <button className="mt-3 w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
-                            Submit Response
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEndedSubmit(poll._id)}
+                            disabled={!!openEndedSubmitting[poll._id]}
+                            className="mt-3 w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+                          >
+                            {openEndedSubmitting[poll._id] ? 'Submitting...' : 'Submit Response'}
                           </button>
                         </div>
                       )}

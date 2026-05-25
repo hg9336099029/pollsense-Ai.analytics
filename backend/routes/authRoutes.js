@@ -1,7 +1,7 @@
 const express = require('express');
 const { register, login, logout, getuserdetails, updateProfile, changePassword } = require('../controller/authController');
 
-const { createPoll, getAllPolls, getUserPolls, deletePoll, voteOnPoll, getVotedPolls, bookmarkpoll, getbookmarkedPolls, getTrendingPolls } = require('../controller/pollController');
+const { createPoll, getAllPolls, getUserPolls, deletePoll, voteOnPoll, getVotedPolls, bookmarkpoll, getbookmarkedPolls, getTrendingPolls, submitOpenEndedResponse } = require('../controller/pollController');
 const { analyzeSentiment } = require('../controller/sentimentController');
 const protect = require('../middleware/authmiddleware');
 const upload = require('../middleware/uploadmiddleware');
@@ -94,5 +94,11 @@ router.post('/analyze-sentiment', protect, (req, res, next) => {
   console.log('Analyze sentiment route called for', req.body?.pollIds?.length, 'polls');
   next();
 }, analyzeSentiment);
+
+// Open-ended poll response submission
+router.post('/openended/:pollId', protect, (req, res, next) => {
+  console.log('Submit open-ended response for poll:', req.params.pollId);
+  next();
+}, submitOpenEndedResponse);
 
 module.exports = router;

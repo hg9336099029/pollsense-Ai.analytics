@@ -98,7 +98,7 @@ export const DashboardLayout = ({ children }) => {
                         className="flex items-center gap-3 px-4 py-3 text-indigo-300 hover:text-white hover:bg-gradient-to-r hover:from-indigo-600 hover:to-violet-600 rounded-lg transition-all duration-200 group relative overflow-hidden"
                     >
                         <span className="absolute inset-0 bg-gradient-to-r from-indigo-900/40 to-violet-900/40 rounded-lg" />
-                        <span className="relative text-lg">🤖</span>
+                        <svg className="relative w-4 h-4 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m1.636-6.364l.707.707M6.343 17.657l-.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>
                         <span className="relative font-semibold text-sm">AI Sentiment</span>
                         <span className="relative ml-auto bg-indigo-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">AI</span>
                     </Link>

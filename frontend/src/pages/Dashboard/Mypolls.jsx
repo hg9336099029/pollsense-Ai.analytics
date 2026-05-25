@@ -61,7 +61,8 @@ const MyPolls = () => {
   };
 
   const getTotalVotes = (poll) => {
-    return poll.options.reduce((sum, opt) => sum + opt.votes, 0);
+    if (!poll.options || !Array.isArray(poll.options) || poll.options.length === 0) return 0;
+    return poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
   };
 
   const getVotePercentage = (votes, total) => {
@@ -143,7 +144,7 @@ const MyPolls = () => {
                     <div className="p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200">
                       <p className="text-sm text-gray-600 mb-4">Created {new Date(poll.createdAt).toLocaleDateString()}</p>
                       {poll.sentiment?.summary && (
-                        <p className="text-xs italic text-gray-400 mb-3">🤖 AI says: "{poll.sentiment.summary}"</p>
+                        <p className="text-xs italic text-gray-400 mb-3">AI insight: "{poll.sentiment.summary}"</p>
                       )}
                       <div className="grid grid-cols-3 gap-4">
                         <div>

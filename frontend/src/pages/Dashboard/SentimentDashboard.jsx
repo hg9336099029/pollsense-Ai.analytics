@@ -20,7 +20,7 @@ const SentimentGauge = ({ score, total, loading }) => {
   const circumference = Math.PI * r;
   const offset = circumference - (score / 100) * circumference;
   const color = score > 66 ? '#22c55e' : score > 33 ? '#f59e0b' : '#ef4444';
-  const label = score > 66 ? '😊 Mostly Positive' : score > 33 ? '😐 Mixed Signals' : '😞 Mostly Negative';
+  const label = score > 66 ? 'Mostly Positive' : score > 33 ? 'Mixed Signals' : 'Mostly Negative';
 
   if (loading) {
     return (
@@ -63,16 +63,16 @@ const SentimentGauge = ({ score, total, loading }) => {
 // ─── Highlight Poll Card ──────────────────────────────────────────────────────
 const HighlightCard = ({ poll, type }) => {
   const configs = {
-    positive:      { title: '🟢 Most Positive',      border: 'border-green-400',  header: 'bg-green-50',  titleColor: 'text-green-700' },
-    negative:      { title: '🔴 Most Negative',      border: 'border-red-400',    header: 'bg-red-50',    titleColor: 'text-red-700'   },
-    controversial: { title: '⚡ Most Controversial', border: 'border-orange-400', header: 'bg-orange-50', titleColor: 'text-orange-700' },
+    positive:      { title: 'Most Positive',      border: 'border-green-400',  header: 'bg-green-50',  titleColor: 'text-green-700' },
+    negative:      { title: 'Most Negative',      border: 'border-red-400',    header: 'bg-red-50',    titleColor: 'text-red-700'   },
+    controversial: { title: 'Most Controversial', border: 'border-orange-400', header: 'bg-orange-50', titleColor: 'text-orange-700' },
   };
   const cfg = configs[type] || configs.positive;
 
   if (!poll) {
     return (
       <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-gray-300 min-h-44">
-        <span className="text-4xl mb-2">🤖</span>
+      <svg className="w-10 h-10 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m1.636-6.364l.707.707M6.343 17.657l-.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>
         <p className="text-sm font-medium text-gray-400">Not enough data yet</p>
       </div>
     );
@@ -99,7 +99,7 @@ const HighlightCard = ({ poll, type }) => {
         </div>
         <p className="text-sm font-semibold text-gray-900 line-clamp-2 mb-2 leading-snug">{poll.question}</p>
         {poll.sentiment?.summary && (
-          <p className="text-xs italic text-gray-400 mb-3 line-clamp-2">💬 {poll.sentiment.summary}</p>
+          <p className="text-xs italic text-gray-400 mb-3 line-clamp-2">AI insight: {poll.sentiment.summary}</p>
         )}
         {poll.sentiment?.keywords?.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
@@ -237,7 +237,9 @@ const SentimentDashboard = () => {
       <DashboardLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
-            <div className="text-5xl mb-4 animate-bounce">🤖</div>
+            <div className="text-indigo-300 mb-4">
+              <svg className="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m1.636-6.364l.707.707M6.343 17.657l-.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>
+            </div>
             <p className="text-gray-600 font-medium">Initializing AI Analysis…</p>
           </div>
         </div>
@@ -248,7 +250,7 @@ const SentimentDashboard = () => {
   const sentimentTotal = sentimentDist.reduce((s, d) => s + d.value, 0);
   const topTopic = [...topicData].sort((a, b) => b.value - a.value)[0]?.name;
   const topEmotion = emotionData[0]?.name;
-  const overallMood = avgSentimentScore > 66 ? 'Positive 😊' : avgSentimentScore > 33 ? 'Mixed 😐' : 'Negative 😞';
+  const overallMood = avgSentimentScore > 66 ? 'Positive' : avgSentimentScore > 33 ? 'Mixed' : 'Negative';
 
   return (
     <DashboardLayout>
@@ -258,7 +260,7 @@ const SentimentDashboard = () => {
           {/* Header */}
           <div className="mb-8 flex items-start justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-3xl font-extrabold text-white tracking-tight">🤖 AI Sentiment Analysis</h1>
+              <h1 className="text-3xl font-extrabold text-white tracking-tight">AI Sentiment Analysis</h1>
               <p className="text-indigo-300 mt-1">Deep AI-powered analysis of poll emotions, topics & community mood</p>
             </div>
             <div className="flex items-center gap-3">
@@ -270,7 +272,7 @@ const SentimentDashboard = () => {
               )}
               {!sentimentLoading && !sentimentError && analyzedCount > 0 && (
                 <span className="bg-emerald-900 text-emerald-300 text-xs px-3 py-2 rounded-full font-medium">
-                  ✅ {analyzedCount} polls analyzed
+                  {analyzedCount} polls analyzed
                 </span>
               )}
               {sentimentError && (
@@ -333,12 +335,14 @@ const SentimentDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
             {/* Sentiment Trend */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">📈 Mood Trend (Weekly)</h2>
+              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">Mood Trend (Weekly)</h2>
               {sentimentLoading ? (
                 <div className="space-y-3">{[1, 2, 3].map(i => <SentimentSkeleton key={i} className="h-8 rounded opacity-50" />)}</div>
               ) : sentimentTrend.length < 2 ? (
                 <div className="flex flex-col items-center justify-center h-52 text-indigo-300 text-sm gap-2">
-                  <span className="text-4xl">📊</span>
+                  <div className="text-indigo-400 mb-2">
+                    <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                  </div>
                   <p>Not enough weekly data yet</p>
                   <p className="text-xs text-indigo-500">Create polls across different weeks to see the trend</p>
                 </div>
@@ -364,7 +368,7 @@ const SentimentDashboard = () => {
 
             {/* Topic Donut */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">🗺️ Topic Distribution</h2>
+              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">Topic Distribution</h2>
               {sentimentLoading ? (
                 <div className="flex justify-center"><SentimentSkeleton className="w-44 h-44 rounded-full opacity-50" /></div>
               ) : topicData.length === 0 ? (
@@ -373,7 +377,7 @@ const SentimentDashboard = () => {
                 <ResponsiveContainer width="100%" height={240}>
                   <PieChart>
                     <Pie data={topicData} cx="50%" cy="50%" innerRadius={60} outerRadius={95} dataKey="value"
-                      label={({ name, value }) => `${TOPIC_ICONS[name] || '🔹'} ${name} (${value})`} labelLine={false}>
+                      label={({ name, value }) => `${name} (${value})`} labelLine={false}>
                       {topicData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
                     <Tooltip
@@ -389,7 +393,7 @@ const SentimentDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
             {/* Poll Type vs Avg Sentiment Bar */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">📊 Poll Type vs Mood Score</h2>
+              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">Poll Type vs Mood Score</h2>
               {sentimentLoading ? (
                 <div className="space-y-3">{[1, 2, 3].map(i => <SentimentSkeleton key={i} className="h-8 rounded opacity-50" />)}</div>
               ) : pollTypeVsScore.length === 0 ? (
@@ -416,7 +420,7 @@ const SentimentDashboard = () => {
 
             {/* Emotion Pills */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">💬 Community Emotions</h2>
+              <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">Community Emotions</h2>
               {sentimentLoading ? (
                 <div className="flex flex-wrap gap-3">
                   {[1, 2, 3, 4, 5].map(i => <SentimentSkeleton key={i} className="h-8 w-24 rounded-full opacity-50" />)}
@@ -446,7 +450,7 @@ const SentimentDashboard = () => {
 
           {/* ── Top 3 Highlight Cards ─────────────────────────────────────── */}
           <div className="mb-6">
-            <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">🏆 AI Poll Highlights</h2>
+            <h2 className="text-white font-bold mb-4 text-sm uppercase tracking-widest">AI Poll Highlights</h2>
             {sentimentLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[1, 2, 3].map(i => <SentimentSkeleton key={i} className="h-52 rounded-2xl opacity-50" />)}
@@ -462,7 +466,7 @@ const SentimentDashboard = () => {
 
           {/* ── AI Quick Stats Banner ─────────────────────────────────────── */}
           <div className="bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-700 rounded-2xl p-6 shadow-xl">
-            <h2 className="text-white font-bold mb-5 text-sm uppercase tracking-widest">🤖 AI-Powered Insights</h2>
+            <h2 className="text-white font-bold mb-5 text-sm uppercase tracking-widest">AI-Powered Insights</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {[
                 { label: 'Mood Score', value: sentimentLoading ? '…' : `${avgSentimentScore}/100` },

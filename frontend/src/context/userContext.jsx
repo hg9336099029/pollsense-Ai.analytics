@@ -5,21 +5,35 @@ export const UserContext = createContext(null);
 
 // Export the provider as a named export instead of default
 function UserProvider({ children }) {
-    const [user, setUser] = useState(null);
+    // Initialize user from local storage immediately to prevent state loss on refresh
+    const [user, setUser] = useState(() => {
+        try {
+            const savedUser = localStorage.getItem('user');
+            return savedUser ? JSON.parse(savedUser) : null;
+        } catch (error) {
+            console.error('Failed to parse user from local storage', error);
+            return null;
+        }
+    });
 
-    // set user details example when user login
     const setUserDetails = (userData) => {
         setUser(userData);
-    }
+        localStorage.setItem('user', JSON.stringify(userData));
+    };
 
-    // clear user details example when user logout
     const clearUserDetails = () => {
         setUser(null);
-    }
+        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+    };
 
-    // get user details example when user login and user details is stored in local storage
+    const logoutUser = () => {
+        clearUserDetails();
+        window.location.href = '/login'; // Global redirect
+    };
+
     return (
-        <UserContext.Provider value={{ user, setUserDetails, clearUserDetails }}>
+        <UserContext.Provider value={{ user, setUserDetails, clearUserDetails, logoutUser }}>
             {children}
         </UserContext.Provider>
     );

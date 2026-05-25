@@ -70,7 +70,8 @@ const Bookmark = () => {
   };
 
   const getTotalVotes = (poll) => {
-    return poll.options.reduce((sum, opt) => sum + opt.votes, 0);
+    if (!poll.options || !Array.isArray(poll.options) || poll.options.length === 0) return 0;
+    return poll.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
   };
 
   const getVotePercentage = (votes, total) => {
@@ -119,7 +120,7 @@ const Bookmark = () => {
                       : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
                   }`}
                 >
-                  {mood === 'All' ? '🔍 All' : `${cfg?.emoji} ${mood}`}
+                  {mood === 'All' ? 'All' : mood}
                 </button>
               );
             })}
@@ -174,7 +175,7 @@ const Bookmark = () => {
                     </div>
                     {poll.sentiment?.summary && (
                       <div className="px-6 pt-3">
-                        <p className="text-xs italic text-gray-400">💬 {poll.sentiment.summary}</p>
+                        <p className="text-xs italic text-gray-400">AI insight: {poll.sentiment.summary}</p>
                       </div>
                     )}
 
