@@ -120,7 +120,7 @@ app.use('/api/v1/auth', authLimiter, authRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  console.log('✅ Health check');
+  console.log(' Health check');
   res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
@@ -149,7 +149,7 @@ app.get('/test-upload', (req, res) => {
 
 // 404 handler
 app.use((req, res) => {
-  console.log('❌ 404 - Route not found:', req.method, req.path);
+  console.log(' 404 - Route not found:', req.method, req.path);
   res.status(404).json({
     message: 'Route not found',
     path: req.path,
@@ -214,23 +214,23 @@ app.use((err, req, res, next) => {
 
 const server = app.listen(port, () => {
   console.log(`\n${'='.repeat(50)}`);
-  console.log(`✅ SERVER STARTED`);
+  console.log(`SERVER STARTED`);
   console.log(`${'='.repeat(50)}`);
-  console.log(`🌐 Server running on: http://localhost:${port}`);
-  console.log(`📁 Uploads directory: ${uploadsDir}`);
-  console.log(`📸 Access uploads at: http://localhost:${port}/uploads/`);
-  console.log(`🔗 API Base URL: http://localhost:${port}/api/v1`);
-  console.log(`✅ CORS allowed origins:`, allowedOrigins);
-  console.log(`🗄️  Database: ${process.env.MONGO_URL ? 'Configured' : 'NOT SET'}`);
-  console.log(`${process.env.JWT_SECRET ? '🔐 JWT Secret: Configured' : '⚠️  JWT Secret: NOT SET'}`);
+  console.log(`Server running on: http://localhost:${port}`);
+  console.log(`Uploads directory: ${uploadsDir}`);
+  console.log(`Access uploads at: http://localhost:${port}/uploads/`);
+  console.log(`API Base URL: http://localhost:${port}/api/v1`);
+  console.log(`CORS allowed origins:`, allowedOrigins);
+  console.log(`Database: ${process.env.MONGO_URL ? 'Configured' : 'NOT SET'}`);
+  console.log(`${process.env.JWT_SECRET ? ' JWT Secret: Configured' : '⚠️  JWT Secret: NOT SET'}`);
   console.log(`${'='.repeat(50)}\n`);
 });
 
 // Handle server errors
 server.on('error', (err) => {
-  console.error('❌ Server error:', err);
+  console.error('Server error:', err);
   if (err.code === 'EADDRINUSE') {
-    console.error(`🚫 Port ${port} is already in use`);
+    console.error(`Port ${port} is already in use`);
     console.error('Try: Kill the process using the port or change PORT in .env');
   }
   process.exit(1);
@@ -238,8 +238,8 @@ server.on('error', (err) => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('⚠️  SIGTERM signal received: closing HTTP server');
+  console.log('SIGTERM signal received: closing HTTP server');
   server.close(() => {
-    console.log('✅ HTTP server closed');
+    console.log('HTTP server closed');
   });
 });
