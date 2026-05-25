@@ -3,6 +3,7 @@ import UserProvider from './context/userContext';
 import SignUpForm from './pages/Auth/SignUpForm';
 import Login from './pages/Auth/loginForm';
 import Dashboard from './pages/Dashboard/Dashboard';
+import SentimentDashboard from './pages/Dashboard/SentimentDashboard';
 import Home from './pages/Dashboard/Home';
 import CreatePoll from './pages/Dashboard/CreatePoll';
 import Mypolls from './pages/Dashboard/Mypolls';
@@ -33,8 +34,9 @@ function App() {
           <Route path="/signup" element={<SignUpForm />} />
           <Route path="/login" element={<Login />} />
 
-          {/* Public Dashboard Route */}
+          {/* Public Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/sentiment-dashboard" element={<SentimentDashboard />} />
 
           {/* Protected Routes */}
           <Route
