@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/userContext';
 import { axiosInstance } from '../../utils/axiosInstance';
 import { API_PATH } from '../../utils/apipath';
@@ -62,6 +62,12 @@ export const DashboardLayout = ({ children }) => {
     const displayName = userData?.username || user?.username || 'User';
     const profileImageUrl = userData?.profileImageUrl || user?.profileImageUrl;
     const userInitial = displayName?.charAt(0).toUpperCase() || 'U';
+    const navLinkClass = ({ isActive }) =>
+        `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
+            isActive
+                ? 'bg-gray-700 text-white'
+                : 'text-gray-300 hover:text-white hover:bg-gray-700'
+        }`;
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -82,76 +88,76 @@ export const DashboardLayout = ({ children }) => {
                 </div>
 
                 <nav className="mt-8 flex-1 px-4 space-y-2">
-                    <Link
+                    <NavLink
                         to="/dashboard"
-                        className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 group"
+                        className={navLinkClass}
                     >
                         <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                         </svg>
                         <span className="font-medium">Dashboard</span>
-                    </Link>
+                    </NavLink>
 
                     {/* Sentiment AI Dashboard */}
-                    <Link
+                    <NavLink
                         to="/sentiment-dashboard"
-                        className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 group"
+                        className={navLinkClass}
                     >
                         <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m1.636-6.364l.707.707M6.343 17.657l-.707.707M17.657 17.657l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>
                         <span className="font-medium">AI Sentiment</span>
-                    </Link>
+                    </NavLink>
 
-                    <Link
+                    <NavLink
                         to="/home"
-                        className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 group"
+                        className={navLinkClass}
                     >
                         <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M5 3a2 2 0 00-2 2v2c0 1.1-.9 2-2 2s2 .9 2 2v2a2 2 0 002 2h5l-1.293-1.293a1 1 0 011.414-1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 00-1.414 1.414L10 5H5z" />
                         </svg>
                         <span className="font-medium">Explore</span>
-                    </Link>
+                    </NavLink>
 
                     {isLoggedIn && (
                         <>
-                            <Link
+                            <NavLink
                                 to="/create-poll"
-                                className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 rounded-lg transition-all duration-200 group"
+                                className={navLinkClass}
                             >
                                 <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                                 </svg>
                                 <span className="font-medium">Create Poll</span>
-                            </Link>
+                            </NavLink>
 
-                            <Link
+                            <NavLink
                                 to="/my-polls"
-                                className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 group"
+                                className={navLinkClass}
                             >
                                 <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5z" />
                                 </svg>
                                 <span className="font-medium">My Polls</span>
-                            </Link>
+                            </NavLink>
 
-                            <Link
+                            <NavLink
                                 to="/voted-polls"
-                                className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 group"
+                                className={navLinkClass}
                             >
                                 <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                                 <span className="font-medium">Voted Polls</span>
-                            </Link>
+                            </NavLink>
 
-                            <Link
+                            <NavLink
                                 to="/bookmarks"
-                                className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 group"
+                                className={navLinkClass}
                             >
                                 <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
                                 </svg>
                                 <span className="font-medium">Bookmarks</span>
-                            </Link>
+                            </NavLink>
                         </>
                     )}
                 </nav>
